@@ -7,6 +7,7 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
 
 def load_data(csv):
     """Load data from CSV"""
@@ -60,9 +61,9 @@ test_accuracy_values = []
 precision_values = []
 test_precision_values = []
 
-for i in range(1,101):
+for i in range(20, 40):
     print(f"Checking top {i} best features...")
-    # Select the top 50 features
+    # Select the top 101 features
     selected_feature_indices = sorted_indices[:i]
 
     # Select the top x features
@@ -72,22 +73,22 @@ for i in range(1,101):
     # Initialize Leave-One-Out cross-validator
     loo = LeaveOneOut()
 
-    # Initialize Support Vector Classifier (SVC) with hyperparameter tuning
-    svc_classifier = SVC(class_weight='balanced')
+    # Initialize k-Nearest Neighbors (k-NN) classifier
+    knn_classifier = KNeighborsClassifier()
 
     # Define the hyperparameters grid
-    param_grid = {'C': [0.1, 1, 10, 100], 'gamma': [1, 0.1, 0.01, 0.001], 'kernel': ['rbf', 'linear', 'poly', 'sigmoid']}
+    param_grid = {'n_neighbors': [3, 5, 7, 9, 11], 'weights': ['uniform', 'distance'], 'metric': ['euclidean', 'manhattan']}
 
     # Perform grid search cross-validation
-    grid_search = GridSearchCV(svc_classifier, param_grid, cv=5, scoring='recall')
+    grid_search = GridSearchCV(knn_classifier, param_grid, cv=5, scoring='precision')
     grid_search.fit(X_selected, y_train)
 
     # Get the best estimator
-    best_svc = grid_search.best_estimator_
+    best_knn = grid_search.best_estimator_
 
     # Perform LOOCV on the best SVC classifier
-    y_pred = cross_val_predict(best_svc, X_selected, y_train, cv=loo)
-    y_test_pred = best_svc.predict(X_test_selected)
+    y_pred = cross_val_predict(best_knn, X_selected, y_train, cv=loo)
+    y_test_pred = best_knn.predict(X_test_selected)
     print(y_test_pred)
 
     # Calculate evaluation metrics
@@ -116,8 +117,8 @@ for i in range(1,101):
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
 
 # Plot training and test accuracies
-ax1.plot(range(1, 101), accuracy_values, marker='o', color='blue', label='Train Accuracy')
-ax1.plot(range(1, 101), test_accuracy_values, marker='o', color='red', label='Test Accuracy')
+ax1.plot(range(20, 40), accuracy_values, marker='o', color='blue', label='Train Accuracy')
+ax1.plot(range(20, 40), test_accuracy_values, marker='o', color='red', label='Test Accuracy')
 ax1.set_xlabel('Number of Selected Features (i)')
 ax1.set_ylabel('Accuracy')
 ax1.set_title('Accuracy vs Number of Selected Features')
@@ -125,8 +126,8 @@ ax1.legend()
 ax1.grid(True)
 
 # Plot training and test precisions
-ax2.plot(range(1, 101), precision_values, marker='o', color='blue', label='Train Precision')
-ax2.plot(range(1, 101), test_precision_values, marker='o', color='red', label='Test Precision')
+ax2.plot(range(20, 40), precision_values, marker='o', color='blue', label='Train Precision')
+ax2.plot(range(20, 40), test_precision_values, marker='o', color='red', label='Test Precision')
 ax2.set_xlabel('Number of Selected Features (i)')
 ax2.set_ylabel('Precision')
 ax2.set_title('Precision vs Number of Selected Features')

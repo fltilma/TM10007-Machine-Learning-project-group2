@@ -15,16 +15,16 @@ ben = len(benign.index)
  our validation set wil contain 8 bening samples and 8 malignant samples'''
 
 #pick 8 random samples from both sets for validation
-malignant_valdation = malignant.sample(n=8, random_state=1)
-benign_validation = benign.sample(n=8, random_state=1)
+malignant_valdation = malignant.sample(n=15, random_state=1)
+benign_validation = benign.sample(n=15, random_state=1)
 
 #remove the validation samples from the test and train set
 malignant_testtrain = malignant.drop(malignant_valdation.index).reset_index(drop=True)
 benign_testtrain = benign.drop(benign_validation.index).reset_index(drop=True)
 
 #pick 8 random samples from both sets for testing
-malignant_test = malignant_testtrain.sample(n=8, random_state=1)
-benign_test = benign_testtrain.sample(n=8, random_state=1)
+malignant_test = malignant_testtrain.sample(n=15, random_state=1)
+benign_test = benign_testtrain.sample(n=15, random_state=1)
 
 #remove the train samples from the train set
 malignant_train = malignant_testtrain.drop(malignant_test.index).reset_index(drop=True)
