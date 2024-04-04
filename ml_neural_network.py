@@ -1,12 +1,14 @@
 import os
 import pandas as pd
 import numpy as np
+import math
 import tensorflow as tf
 import keras
 from sklearn.model_selection import LeaveOneOut
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from keras.callbacks import EarlyStopping
+from keras.layers import LeakyReLU
 
 print("TensorFlow version:", tf.__version__)
 
@@ -33,6 +35,13 @@ data = data.loc[:, data.apply(pd.Series.nunique) != 1]  # Keeps only columns wit
 X = data.drop('label', axis=1)
 y = data['label']
 
+
+# Find the optimal number of neurons
+n_neurons_input = X.shape[1]
+n_neurons_output = 1
+n_neurons = np.mean([n_neurons_input, n_neurons_output])
+n_neurons = math.ceil(n_neurons)
+
 # Map labels to numerical values
 y = y.map({'benign': 0, 'malignant': 1})
 
@@ -43,9 +52,12 @@ X_scaled = scaler.fit_transform(X)
 # Define a simple neural network model using TensorFlow's Keras API
 model = keras.Sequential([
     keras.layers.Input(shape=(X_scaled.shape[1],)), # Input layer
-    keras.layers.Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)), # Hidden layer with L2 regularization
+    keras.layers.Dense(n_neurons, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)), # Hidden layer with L2 regularization
     keras.layers.Dropout(0.5), # Dropout layer
-    keras.layers.Dense(1, activation='sigmoid') # Output layer
+    keras.layers.Dense(1, activation='sigmoid') # Output layer test sigmoid
+    #keras.layers.Dense(1, activation='relu') # Output layer test relu
+    #keras.layers.Dense(1, activation='leaky_relu') # Output layer test leaky_relu
+    #keras.layers.Dense(1, activation='tanh') # Output layer test tanh
 ])
 
 # Compile the model
