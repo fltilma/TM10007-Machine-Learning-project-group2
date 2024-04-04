@@ -67,10 +67,10 @@ y_pred = np.zeros_like(y_np)
 for train_index, test_index in loo.split(X_scaled):
     X_train, X_test = X_scaled[train_index], X_scaled[test_index]
     y_train, y_test = y_np[train_index], y_np[test_index]
-    
+
     # Train the model on the training data
     model.fit(X_train, y_train, epochs=30, verbose=1, callbacks=[early_stopping]) # Fit the model with Leave-One-Out Early Stopping
-    
+
     # Predict on the test data
     y_pred[test_index] = (model.predict(X_test) > 0.5).astype(int)
 
@@ -87,5 +87,3 @@ print(f"Precision: {precision}")
 print(f"Recall: {recall}")
 print(f"F1-score: {f1}")
 print(f"ROC-AUC: {roc_auc}")
-
-
