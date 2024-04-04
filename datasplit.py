@@ -4,6 +4,8 @@ import pandas as pd
 #data = load_data()
 data = pd.read_csv(r"C:\Users\delan\Downloads\TM10007-Machine-Learning-project-group2\worcliver\Liver_radiomicFeatures.csv")
 
+#removing features that are constant
+data = data.loc[:, data.apply(pd.Series.nunique) != 1]
 malignant = data[data['label'] == 'malignant']
 benign = data[data['label'] == 'benign']
 
@@ -32,9 +34,6 @@ benign_train = benign_testtrain.drop(benign_test.index).reset_index(drop=True)
 validation = pd.concat([malignant_valdation,benign_validation])
 test = pd.concat([malignant_test,benign_test])
 train = pd.concat([malignant_train,benign_train])
-validation = validation.loc[:, validation.apply(pd.Series.nunique) != 1]
-test = test.loc[:, test.apply(pd.Series.nunique) != 1]
-train = train.loc[:, train.apply(pd.Series.nunique) != 1]
 validation.to_csv('validation_data.csv', index=False)
 test.to_csv('test_data.csv', index=False)
 train.to_csv('train_data.csv', index=False)
