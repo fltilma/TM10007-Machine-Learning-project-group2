@@ -19,8 +19,8 @@ pipeline = Pipeline([
 param_grid = {
     'selector__score_func':[f_classif],
     'selector__k': range(1,110,10),
-    'knn__n_neighbors': range(1,25,5),  # Example values, you can adjust as needed
-    'knn__weights': ['uniform', 'distance']  # Example values, you can adjust as needed
+    'knn__n_neighbors': range(1,25,5),
+    'knn__weights': ['uniform', 'distance'] 
 }
 
 scoring = {'accuracy': 'accuracy',

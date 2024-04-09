@@ -1,6 +1,6 @@
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, LeaveOneOut
+from sklearn.model_selection import GridSearchCV, LeaveOneOut
 from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.preprocessing import RobustScaler, StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
@@ -18,8 +18,9 @@ pipeline = Pipeline([
 #initialize grid
 param_grid = {
     'selector__score_func':[f_classif],
-    'selector__k': range(20,110,2),
-    'svm__kernel': ['linear']
+    'selector__k': [47],
+    'svm__kernel': ['linear'],
+    'svm__C': [1]
 }
 
 scoring = {'accuracy': 'accuracy',
@@ -30,7 +31,7 @@ scoring = {'accuracy': 'accuracy',
 
 # Instantiate GridSearchCV with pipeline
 print("Searching grid...")
-grid_search = GridSearchCV(pipeline, param_grid, scoring=scoring, refit='f1', cv=LeaveOneOut())
+grid_search = GridSearchCV(pipeline, param_grid, scoring=scoring, refit='recall', cv=LeaveOneOut())
 
 # Fit GridSearchCV
 grid_search.fit(X_train, y_train)
