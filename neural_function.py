@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+import math
 import keras
 from sklearn.model_selection import LeaveOneOut
 from sklearn.preprocessing import StandardScaler
@@ -31,12 +32,18 @@ def train_neural_network():
     data = load_data()
 
     # Remove constant features
-    data = data.loc[:, data.apply(pd.Series.nunique) != 1]  # Keeps only columns with more than one unique value
+    data = data.loc[:, data.apply(pd.Series.nunique) != 1]# Keeps only columns with more than one unique value
     no_constants = data.columns
 
     # Separate features (X) and target variable (y)
     X = data.drop('label', axis=1)
     y = data['label']
+    
+    # Find the optimal number of neurons
+    n_neurons_input = X.shape[1]
+    n_neurons_output = 1
+    n_neurons = np.mean([n_neurons_input, n_neurons_output])
+    n_neurons = math.ceil(n_neurons)
 
     # Map labels to numerical values
     y = y.map({'benign': 0, 'malignant': 1})
@@ -47,16 +54,19 @@ def train_neural_network():
 
     # Define a simple neural network model using TensorFlow's Keras API
     model = keras.Sequential([
-        keras.layers.Input(shape=(X_scaled.shape[1],)),  # Input layer
-        keras.layers.Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),  # Hidden layer with L2 regularization
-        keras.layers.Dropout(0.5),  # Dropout layer
-        keras.layers.Dense(1, activation='sigmoid')  # Output layer
+        keras.layers.Input(shape=(X_scaled.shape[1],)), # Input layer
+        keras.layers.Dense(n_neurons, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)), # Hidden layer with L2 regularization
+        keras.layers.Dropout(0.5), # Dropout layer
+        keras.layers.Dense(1, activation='sigmoid') # Output layer test sigmoid
+        #keras.layers.Dense(1, activation='relu') # Output layer test relu
+        #keras.layers.Dense(1, activation='leaky_relu') # Output layer test leaky_relu
+        #keras.layers.Dense(1, activation='tanh') # Output layer test tanh
     ])
 
     # Compile the model
     model.compile(optimizer='adam',
-                  loss='binary_crossentropy',  # Binary crossentropy loss
-                  metrics=[keras.metrics.Recall()])  # Recall as metrics
+                loss='binary_crossentropy', # Binary crossentropy loss
+                metrics=[keras.metrics.Recall()]) # recall as metrics
 
     # Initialize Leave-One-Out cross-validator
     loo = LeaveOneOut()
@@ -74,7 +84,7 @@ def train_neural_network():
         y_train, y_test = y_np[train_index], y_np[test_index]
 
         # Train the model on the training data
-        model.fit(X_train, y_train, epochs=30, verbose=1, callbacks=[early_stopping])  # Fit the model with Leave-One-Out Early Stopping
+        model.fit(X_train, y_train, epochs=30, verbose=1, callbacks=[early_stopping]) # Fit the model with Leave-One-Out Early Stopping
 
         # Predict on the test data
         y_pred[test_index] = (model.predict(X_test) > 0.5).astype(int)
