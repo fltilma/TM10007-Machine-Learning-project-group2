@@ -3,9 +3,10 @@ Since we will use LOOCV, we do not need a separate training set.'''
 import pandas as pd
 #data = load_data()
 data = pd.read_csv(r"C:\Users\delan\Downloads\TM10007-Machine-Learning-project-group2\worcliver\Liver_radiomicFeatures.csv")
-
+print('features before cons removal:', data.shape)
 #removing features that are constant
 data = data.loc[:, data.apply(pd.Series.nunique) != 1]
+print('features after removal:', data.shape)
 malignant = data[data['label'] == 'malignant']
 benign = data[data['label'] == 'benign']
 
