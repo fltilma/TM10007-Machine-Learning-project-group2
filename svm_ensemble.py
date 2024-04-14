@@ -9,6 +9,8 @@ import numpy as np
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from preprocessing import preprocessing
+from ploty_learning_curve import ploty_learning_curve
+from get_scores import save_scores_to_csv
 
 # Load data
 X_train, X_test, X_validation, y_train, y_test, y_validation = preprocessing()
@@ -33,13 +35,13 @@ knn_pipeline = Pipeline([
 
 # Define parameter grids for SVM and KNN
 svm_param_grid = {
-    'pca__n_components': [1, 10, 20, 30],  # Adjust the number of components as needed
+    'pca__n_components': [26],  # Adjust the number of components as needed
     'svm__kernel': ['linear'],
     'svm__C': [1]
 }
 
 knn_param_grid = {
-    'pca__n_components': [1, 10, 20, 30],  # Adjust the number of components as needed
+    'pca__n_components': [26],  # Adjust the number of components as needed
     'knn__n_neighbors': [5]
 }
 
@@ -53,12 +55,19 @@ knn_grid_search.fit(X_train, y_train)
 
 # Get best models
 best_svm_model = svm_grid_search.best_estimator_
+svm_params = svm_grid_search.best_params_
 best_knn_model = knn_grid_search.best_estimator_
+knn_params = knn_grid_search.best_params_
 
 # Predictions from base models on validation set
+svm_pred_train = best_svm_model.predict(X_train)
 svm_pred_validation = best_svm_model.predict(X_validation)
+knn_pred_train = best_knn_model.predict(X_train)
 knn_pred_validation = best_knn_model.predict(X_validation)
 
+
+save_scores_to_csv(svm_pred_train, svm_pred_validation, y_train, y_validation, svm_params, "zsvm_scores.csv")
+save_scores_to_csv(knn_pred_train, knn_pred_validation, y_train, y_validation, knn_params, "zknn_scores.csv")
 # Define a range of thresholds
 thresholds = np.linspace(0.1, 0.9, 9)
 
@@ -148,3 +157,13 @@ print("Number of components selected by PCA in the SVM pipeline:", best_svm_mode
 
 # Print the number of components selected by PCA in the KNN pipeline
 print("Number of components selected by PCA in the KNN pipeline:", best_knn_model.named_steps['pca'].n_components_)
+
+# Plot learning curve for SVM
+title = "Learning Curves (SVM)"
+ploty_learning_curve(best_svm_model, title, X_train, y_train, cv=LeaveOneOut(), n_jobs=-1)
+
+# Plot learning curve for KNN
+title = "Learning Curves (KNN)"
+ploty_learning_curve(best_knn_model, title, X_train, y_train, cv=LeaveOneOut(), n_jobs=-1)
+
+plt.show()

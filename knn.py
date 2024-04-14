@@ -1,7 +1,9 @@
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, LeaveOneOut
-from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.preprocessing import RobustScaler, StandardScaler
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.model_selection import GridSearchCV, LeaveOneOut, learning_curve
+from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from preprocessing import preprocessing
@@ -11,16 +13,14 @@ print('Data loading succesfull')
 #initializing pipeline
 pipeline = Pipeline([
     ('scaler', StandardScaler()),
-    ('selector', SelectKBest()),
+    ('pca', PCA()),
     ('knn', KNeighborsClassifier())
 ])
 
 #initialize grid
 param_grid = {
-    'selector__score_func':[f_classif],
-    'selector__k': range(1,110,10),
-    'knn__n_neighbors': range(1,25,5),
-    'knn__weights': ['uniform', 'distance'] 
+    'pca__n_components': [25,26],
+    'knn__n_neighbors': [4,5,6]
 }
 
 scoring = {'accuracy': 'accuracy',
