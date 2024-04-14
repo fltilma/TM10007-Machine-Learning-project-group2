@@ -45,9 +45,15 @@ knn_param_grid = {
     'knn__n_neighbors': [5]
 }
 
+scoring = {'accuracy': 'accuracy',
+           'precision': 'precision',
+           'recall': 'recall',
+           'f1' : 'f1'
+}
+
 # Instantiate GridSearchCV with pipelines for SVM and KNN
-svm_grid_search = GridSearchCV(svm_pipeline, svm_param_grid, scoring='recall', cv=LeaveOneOut())
-knn_grid_search = GridSearchCV(knn_pipeline, knn_param_grid, scoring='recall', cv=LeaveOneOut())
+svm_grid_search = GridSearchCV(svm_pipeline, svm_param_grid, scoring=scoring, refit='f1', cv=LeaveOneOut())
+knn_grid_search = GridSearchCV(knn_pipeline, knn_param_grid, scoring=scoring, refit='f1', cv=LeaveOneOut())
 
 # Fit GridSearchCV for SVM and KNN
 svm_grid_search.fit(X_train, y_train)
