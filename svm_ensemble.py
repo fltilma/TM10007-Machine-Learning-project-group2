@@ -35,13 +35,13 @@ knn_pipeline = Pipeline([
 
 # Define parameter grids for SVM and KNN
 svm_param_grid = {
-    'pca__n_components': [26],  # Adjust the number of components as needed
+    'pca__n_components': [20],  # Adjust the number of components as needed
     'svm__kernel': ['linear'],
-    'svm__C': [1]
+    'svm__C': [3]
 }
 
 knn_param_grid = {
-    'pca__n_components': [26],  # Adjust the number of components as needed
+    'pca__n_components': [24],  # Adjust the number of components as needed
     'knn__n_neighbors': [5]
 }
 
