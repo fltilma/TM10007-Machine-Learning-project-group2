@@ -71,13 +71,11 @@ svm_pred_validation = best_svm_model.predict(X_validation)
 svm_pred_test = best_svm_model.predict(X_test)
 knn_pred_train = best_knn_model.predict(X_train)
 knn_pred_validation = best_knn_model.predict(X_validation)
-knn_pred_test = best_knn_model.predict(X_test)
-
 
 save_scores_to_csv(svm_pred_train, svm_pred_validation, y_train, y_validation, svm_params, "zsvm_scores.csv")
 save_scores_to_csv(svm_pred_train, svm_pred_test, y_train, y_test, svm_params, "zsvm_test_scores.csv")
 save_scores_to_csv(knn_pred_train, knn_pred_validation, y_train, y_validation, knn_params, "zknn_scores.csv")
-save_scores_to_csv(knn_pred_train, knn_pred_test, y_train, y_test, knn_params, "zknn_test_scores.csv")
+
 # Define a range of thresholds
 thresholds = np.linspace(0.1, 0.9, 9)
 
@@ -216,7 +214,7 @@ plt.legend(loc="lower right")
 plt.show()
 
 # Compute ROC curve and ROC area for each class
-fpr, tpr, _ = roc_curve(y_test, knn_pred_test)
+fpr, tpr, _ = roc_curve(y_validation, svm_pred_validation)
 roc_auc = auc(fpr, tpr)
 
 # Plot ROC curve
@@ -229,6 +227,6 @@ plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC) Curve of kNN classifier on test data')
+plt.title('Receiver Operating Characteristic (ROC) Curve of SVM classifier on validation data')
 plt.legend(loc="lower right")
 plt.show()
