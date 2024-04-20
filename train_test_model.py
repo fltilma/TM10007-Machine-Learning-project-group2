@@ -126,45 +126,10 @@ meta_model_train.fit(meta_features_train, y_train)
 # Predictions from meta-model on training set
 stacking_train_predictions = meta_model_train.predict(meta_features_train)
 
-# Evaluation on training set
-stacking_train_recall = recall_score(y_train, stacking_train_predictions)
-stacking_train_f1 = f1_score(y_train, stacking_train_predictions)
-stacking_train_accuracy = accuracy_score(y_train, stacking_train_predictions)
-stacking_train_precision = precision_score(y_train, stacking_train_predictions)
-
-# Print scores for training set
-print("Training Set Scores:")
-print("Recall:", stacking_train_recall)
-print("F1 Score:", stacking_train_f1)
-print("Accuracy:", stacking_train_accuracy)
-print("Precision:", stacking_train_precision)
-
-# Convert predictions to binary using the best threshold for the validation set
-svm_pred_validation_binary = (best_svm_model.predict(X_validation) > best_threshold).astype(int)
-knn_pred_validation_binary = (best_knn_model.predict(X_validation) > best_threshold).astype(int)
-meta_features_validation = np.column_stack((svm_pred_validation_binary, knn_pred_validation_binary))
-
 # Predictions from meta-model on validation set
 stacking_validation_predictions = meta_model_train.predict(meta_features_validation)
 
-# Evaluation on validation set
-stacking_validation_recall = recall_score(y_validation, stacking_validation_predictions)
-stacking_validation_f1 = f1_score(y_validation, stacking_validation_predictions)
-stacking_validation_accuracy = accuracy_score(y_validation, stacking_validation_predictions)
-stacking_validation_precision = precision_score(y_validation, stacking_validation_predictions)
-
-# Print scores for validation set
-print("Validation Set Scores:")
-print("Recall:", stacking_validation_recall)
-print("F1 Score:", stacking_validation_f1)
-print("Accuracy:", stacking_validation_accuracy)
-print("Precision:", stacking_validation_precision)
-
-# Print the number of components selected by PCA in the SVM pipeline
-print("Number of components selected by PCA in the SVM pipeline:", best_svm_model.named_steps['pca'].n_components_)
-
-# Print the number of components selected by PCA in the KNN pipeline
-print("Number of components selected by PCA in the KNN pipeline:", best_knn_model.named_steps['pca'].n_components_)
+save_scores_to_csv(stacking_train_predictions, stacking_validation_predictions, y_train, y_validation, 0, "zensemble_scores.csv")
 
 # Plot learning curve for SVM
 title = "Learning Curves (SVM)"
