@@ -41,7 +41,7 @@ svm_param_grid = {
 }
 
 knn_param_grid = {
-    'pca__n_components': [12],  # Adjust the number of components as needed
+    'pca__n_components': [24],  # Adjust the number of components as needed
     'knn__n_neighbors': [5]
 }
 
