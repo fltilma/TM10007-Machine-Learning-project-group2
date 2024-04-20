@@ -19,8 +19,8 @@ pipeline = Pipeline([
 
 #initialize grid
 param_grid = {
-    'pca__n_components': [25,26],
-    'knn__n_neighbors': [4,5,6]
+    'pca__n_components': range(1,50),
+    'knn__n_neighbors': range(1,11)
 }
 
 scoring = {'accuracy': 'accuracy',
