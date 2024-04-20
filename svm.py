@@ -21,7 +21,7 @@ pipeline = Pipeline([
 param_grid = {
     'pca__n_components': range(1,50),
     'svm__kernel': ['linear'],
-    'svm__C': [1]
+    'svm__C': [1,2,3,4,5]
 }
 
 scoring = {'accuracy': 'accuracy',
