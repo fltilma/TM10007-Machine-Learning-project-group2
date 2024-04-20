@@ -13,7 +13,7 @@ benign = data[data['label'] == 'benign']
 mal = len(malignant.index)
 ben = len(benign.index)
 '''We see that the amount of bening and malignant is relatively the same. Therefore,
- our validation set wil contain 8 bening samples and 8 malignant samples'''
+ our validation set wil contain 15 bening samples and 15 malignant samples'''
 
 #pick 8 random samples from both sets for validation
 malignant_valdation = malignant.sample(n=15, random_state=1)

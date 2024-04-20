@@ -1,0 +1,6 @@
+Best parameters,"{'pca__n_components': 20, 'svm__C': 3, 'svm__kernel': 'linear'}"
+Metric,Train,Validation
+Accuracy,0.9444444444444444,0.7
+Precision,0.9830508474576272,0.75
+Recall,0.90625,0.6
+F1,0.943089430894309,0.6666666666666666

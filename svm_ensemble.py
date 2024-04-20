@@ -4,9 +4,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-import numpy as np
 from sklearn.decomposition import PCA
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc
+import numpy as np
 import matplotlib.pyplot as plt
 from preprocessing import preprocessing
 from ploty_learning_curve import ploty_learning_curve
@@ -68,12 +68,16 @@ knn_params = knn_grid_search.best_params_
 # Predictions from base models on validation set
 svm_pred_train = best_svm_model.predict(X_train)
 svm_pred_validation = best_svm_model.predict(X_validation)
+svm_pred_test = best_svm_model.predict(X_test)
 knn_pred_train = best_knn_model.predict(X_train)
 knn_pred_validation = best_knn_model.predict(X_validation)
+knn_pred_test = best_knn_model.predict(X_test)
 
 
 save_scores_to_csv(svm_pred_train, svm_pred_validation, y_train, y_validation, svm_params, "zsvm_scores.csv")
+save_scores_to_csv(svm_pred_train, svm_pred_test, y_train, y_test, svm_params, "zsvm_test_scores.csv")
 save_scores_to_csv(knn_pred_train, knn_pred_validation, y_train, y_validation, knn_params, "zknn_scores.csv")
+save_scores_to_csv(knn_pred_train, knn_pred_test, y_train, y_test, knn_params, "zknn_test_scores.csv")
 # Define a range of thresholds
 thresholds = np.linspace(0.1, 0.9, 9)
 
@@ -86,12 +90,12 @@ for threshold in thresholds:
     # Convert predictions to binary using the current threshold
     svm_pred_validation_binary = (svm_pred_validation > threshold).astype(int)
     knn_pred_validation_binary = (knn_pred_validation > threshold).astype(int)
-    
+
     # Prepare meta-features for validation set
     meta_features_validation = np.column_stack((svm_pred_validation_binary, knn_pred_validation_binary))
 
     # Meta-model with regularization
-    meta_model = LogisticRegression(penalty='l2', C=1.0)  # Regularization 
+    meta_model = LogisticRegression(penalty='l2', C=1.0)  # Regularization
 
     # Fit meta-model on meta-features
     meta_model.fit(meta_features_validation, y_validation)
@@ -172,4 +176,59 @@ ploty_learning_curve(best_svm_model, title, X_train, y_train, cv=LeaveOneOut(), 
 title = "Learning Curves (KNN)"
 ploty_learning_curve(best_knn_model, title, X_train, y_train, cv=LeaveOneOut(), n_jobs=-1)
 
+plt.show()
+
+
+# Compute ROC curve and ROC area for each class
+fpr, tpr, _ = roc_curve(y_test, svm_pred_test)
+roc_auc = auc(fpr, tpr)
+
+# Plot ROC curve
+plt.figure()
+lw = 2
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve of linear SVM classifier on test data')
+plt.legend(loc="lower right")
+plt.show()
+
+# Compute ROC curve and ROC area for each class
+fpr, tpr, _ = roc_curve(y_validation, knn_pred_validation)
+roc_auc = auc(fpr, tpr)
+
+# Plot ROC curve
+plt.figure()
+lw = 2
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve of kNN classifier on validation data')
+plt.legend(loc="lower right")
+plt.show()
+
+# Compute ROC curve and ROC area for each class
+fpr, tpr, _ = roc_curve(y_test, knn_pred_test)
+roc_auc = auc(fpr, tpr)
+
+# Plot ROC curve
+plt.figure()
+lw = 2
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve of kNN classifier on test data')
+plt.legend(loc="lower right")
 plt.show()
